@@ -1,0 +1,145 @@
+<!-- 
+Date: 05/20/24
+Project: VR Social Media 
+Credit: ChatGPT, John, Adam, Kevin 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VR Portal Experience</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .portal-hover {
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .portal-hover:hover {
+            transform: scale(1.2);
+            background-color: #00FF00;
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .rotate-animation {
+            animation: rotate 5s infinite linear;
+        }
+    </style>
+</head>
+<body>
+    <a-scene>
+        <!-- Assets -->
+        <a-assets>
+            <a-asset-item id="robotoFont" src="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-asset-item>
+        </a-assets>
+
+        <!-- Space background -->
+        <a-sky src="https://cdn.aframe.io/a-painter/images/sky.jpg"></a-sky>
+
+        <!-- Forest environment -->
+        <a-entity environment="preset: forest; groundColor: #445; grid: cross"></a-entity>
+
+        <!-- Portal -->
+        <a-entity position="0 2.3 -5">
+            <!-- Animated Portal Circle with Bootstrap and CSS Animation -->
+            <a-circle 
+                id="portal" 
+                class="portal-hover rotate-animation" 
+                src="classroom.png" 
+                radius="2" 
+                animation__mousescale="property: scale; from: 1 1 1; to: 1.1 1.1 1.1; easing: easeInOutQuad; dir: alternate; loop: true; startEvents: mouseenter; dur: 1000; pauseEvents: mouseleave"
+                rotation="0 0 0"
+                event-set__click="_event: click; _target: #portal; material.color: #FF0000"></a-circle>
+            <!-- 3D Portal Label -->
+            <a-entity 
+                id="textBox1" 
+                geometry="primitive: box; 
+                depth: 0.1; 
+                width: 2; 
+                height: 0.5" 
+                position="0 2.8 0.1" 
+                material="color: black"
+                animation="property: scale; to: 1.1 1.1 1.1; dir: alternate; dur: 1000; loop: true">
+                <a-text value="Enter Classroom" align="center" position="0 0 0.06" color="#FFF" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- New Credits Text Box on the Right Side -->
+        <a-entity position="4.0 2.8 -5">
+            <a-entity 
+                id="textBox2" 
+                geometry="primitive: box; 
+                depth: 0.1; 
+                width: 3; 
+                height: 1.5" 
+                material="color: black"
+                animation="property: scale; to: 1.1 1.1 1.1; dir: alternate; dur: 1000; loop: true">
+                <a-text value="Credits\n\n• Drofont      • Song:Celestial\nd•ChatGPT-4o        • A-Frame\n•Professor DonWei" 
+                    align="center" 
+                    position="0 0 0.06" 
+                    color="#FFF" 
+                    font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+                    width="2.8" 
+                    wrap-count="30">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- New Project Made By Text Box on the Left Side -->
+        <a-entity position="-4.0 2.8 -5">
+            <a-entity 
+                id="textBox3" 
+                geometry="primitive: box; 
+                depth: 0.1; 
+                width: 3; 
+                height: 1.5" 
+                material="color: black"
+                animation="property: scale; to: 1.1 1.1 1.1; dir: alternate; dur: 1000; loop: true">
+                <a-text value="Project made by\n\n• John\n• Adam\n• Kevin" 
+                    align="center" 
+                    position="0 0 0.06" 
+                    color="#FFF" 
+                    font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+                    width="2.8"
+                    wrap-count="30">
+                </a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- Background Audio -->
+        <a-sound src="John 3.0 Master.wav" autoplay="true" loop="true" volume="0.1"></a-sound>
+
+        <!-- Lighting -->
+        <a-light type="ambient" color="#888"></a-light>
+        <a-light type="directional" color="#FFF" intensity="0.5" position="-1 1 0"></a-light>
+
+        <!-- Camera with movement controls and cursor -->
+        <a-entity position="0 1.6 0">
+            <a-camera look-controls wasd-controls position="0 0 0">
+                <a-cursor 
+                    id="cursor" 
+                    material="color: white; shader: flat"
+                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03">
+                </a-cursor>
+            </a-camera>
+        </a-entity>
+
+        <!-- Oculus Touch Controls -->
+        <a-entity id="left-hand" hand-controls="hand: left; handModelStyle: lowPoly; color: #ffcccc"></a-entity>
+        <a-entity id="right-hand" hand-controls="hand: right; handModelStyle: lowPoly; color: #ffcccc"></a-entity>
+
+
+        <!-- Stats for performance monitoring -->
+        <a-scene stats></a-scene>
+    </a-scene>
+
+    <script>
+        document.querySelector('#portal').addEventListener('click', function () {
+            window.location.href = 'classroom.html';
+        });
+    </script>
+</body>
+</html>

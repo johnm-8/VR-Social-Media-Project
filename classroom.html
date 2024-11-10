@@ -1,0 +1,301 @@
+<!-- 
+Date: 05/20/24
+Project: VR Social Media 
+Credit: ChatGPT, John, Adam, Kevin 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Classroom with Login</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        #login-container { 
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        #login-form {
+            background: white;
+            padding: 40px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        #login-form input {
+            display: block;
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #login-form button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-container">
+        <div id="login-form">
+            <h2>Login</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+        </div>
+    </div>
+
+    <a-scene>
+        <!-- Sky and lighting -->
+        <a-sky color="#ECECEC"></a-sky>
+        <a-light type="ambient" color="#ccc"></a-light>
+        <a-light type="directional" position="0 10 0" intensity="0.5"></a-light>
+
+        <!-- Forest environment -->
+        <a-entity environment="preset: osiris; ground: hills;  groundColor: #445; grid: cross"></a-entity>
+
+        <!-- Chalkboard at the front of the room -->
+        <a-box position="0 2 -28.9" depth="0.1" height="2" width="8" color="#333"></a-box>
+        
+        <!-- Video on the left side of the chalkboard -->
+        <a-video src="#sample-video" position="-3 2 -28.8" width="1" height="1.5" rotation="0 0 0"></a-video>
+
+        <!-- Video on the right side of the chalkboard -->
+        <a-video src="#sample-video-right" position="3 2 -28.8" width="1" height="1.5" rotation="0 0 0" muted></a-video>
+
+        <!-- Video asset definition -->
+        <a-assets>
+            <video id="sample-video" src="subway.mp4" autoplay loop="true" crossorigin="anonymous" muted></video>
+            <video id="sample-video-right" src="subway.mp4" autoplay loop="true" crossorigin="anonymous" muted></video>
+        </a-assets>
+
+        <!-- Central Image -->
+        <a-image id="image-display" position="0 2 -28.8" height="1.5" width="3" src=""></a-image>
+        
+        <!-- Left Triangle -->
+        <a-plane id="left-button" position="-1.8 2 -28.7" width="0.2" height="0.2" rotation="0 0 90" color="red"></a-plane>
+        <!-- Right Triangle -->
+        <a-plane id="right-button" position="1.8 2 -28.7" width="0.2" height="0.2" rotation="0 0 -90" color="red"></a-plane>
+        
+        <!-- Camera and Cursor -->
+        <a-entity camera look-controls wasd-controls position="0 1.6 10">
+            <a-cursor></a-cursor>
+        </a-entity>
+    </a-scene>
+
+    <script>
+        let loggedIn = false;
+        const images = [
+            'present1.png', // Replace with actual image URLs
+            'present2.png',
+            'present3.png',
+            'present4.png',
+            'present5.png',
+            'present6.png',
+            'present7.png'
+        ];
+        let currentIndex = 0;
+
+        // Function to update the image display
+        function updateImage() {
+            document.getElementById('image-display').setAttribute('src', images[currentIndex]);
+        }
+
+        // Initial image setup
+        updateImage();
+
+        // Event listeners for navigation buttons
+        document.getElementById('left-button').addEventListener('click', () => {
+            currentIndex = (currentIndex > 0) ? currentIndex - 1 : images.length - 1;
+            updateImage();
+        });
+
+        document.getElementById('right-button').addEventListener('click', () => {
+            currentIndex = (currentIndex < images.length - 1) ? currentIndex + 1 : 0;
+            updateImage();
+        });
+
+        // Function to handle the login process
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // AJAX request to the server
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'http://localhost:3000/login', true); // Update URL if necessary
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (xhr.status === 200 && response.success) {
+                        loggedIn = true;
+                        document.getElementById('login-container').style.display = 'none';
+                    } else {
+                        alert('Invalid email or password');
+                    }
+                }
+            };
+            xhr.send(JSON.stringify({ email: email, password: password }));
+        }
+
+        AFRAME.registerComponent('click-listener', {
+            init: function () {
+                this.el.addEventListener('click', (evt) => {
+                    if (!loggedIn) {
+                        alert('You must log in first!');
+                        return;
+                    }
+                    console.log('Door clicked');
+                    if (!this.doorIsOpen) {
+                        this.el.emit('open');
+                        this.doorIsOpen = true;
+                    } else {
+                        this.el.emit('close');
+                        this.doorIsOpen = false;
+                    }
+                });
+            }
+        });
+        
+        AFRAME.registerComponent('hover-box', {
+            schema: {
+                message: {type: 'string', default: 'Social Media Info'}
+            },
+            init: function () {
+                const data = this.data;
+                const el = this.el;
+
+                // Create hover box
+                const hoverBox = document.createElement('a-plane');
+                hoverBox.setAttribute('geometry', { primitive: 'plane', width: 1.5, height: 0.5 });
+                hoverBox.setAttribute('material', { color: '#fff', opacity: 0.9 });
+                hoverBox.setAttribute('text', {
+                    value: data.message,
+                    color: 'black',
+                    align: 'center',
+                    width: 1.4, // Adjust the width to fit within the plane
+                    wrapCount: 20 // Control text wrapping
+                });
+                hoverBox.setAttribute('position', { x: 0, y: 1, z: 0 });
+                hoverBox.setAttribute('visible', 'false');
+                hoverBox.setAttribute('look-at', '[camera]'); // Ensure the hover box faces the camera
+
+                // Add class for cursor interaction
+                hoverBox.classList.add('clickable');
+                hoverBox.setAttribute('cursor-listener', '');
+
+                el.appendChild(hoverBox);
+
+                el.addEventListener('mouseenter', () => {
+                    hoverBox.setAttribute('visible', 'true');
+                });
+
+                el.addEventListener('mouseleave', () => {
+                    hoverBox.setAttribute('visible', 'false');
+                });
+
+                hoverBox.addEventListener('click', () => {
+                    if (!loggedIn) {
+                        alert('You must log in first!');
+                        return;
+                    }
+                    alert(`Hover box clicked: ${data.message}`);
+                });
+            }
+        });
+
+        // Define the cursor-listener component for click events
+        AFRAME.registerComponent('cursor-listener', {
+            init: function () {
+                this.el.addEventListener('click', (evt) => {
+                    const message = evt.target.getAttribute('text').value;
+                    console.log('Hover box clicked:', message);
+                    alert(`Hover box clicked: ${message}`);
+                    // You can also perform other actions here, like opening a URL
+                    // window.open('https://example.com', '_blank');
+                });
+            }
+        });
+
+        // Additional scripts for tables and chairs
+        const sceneEl = document.querySelector('a-scene');
+        function createTableAndComputers(x, z) {
+            // Create a table
+            const table = document.createElement('a-box');
+            table.setAttribute('position', `${x} 0.75 ${z}`);
+            table.setAttribute('depth', '1');
+            table.setAttribute('height', '0.5');
+            table.setAttribute('width', '4');
+            table.setAttribute('color', '#8B4513');
+            sceneEl.appendChild(table);
+
+            // Create computers and chairs
+            const socialMedia = [
+                { name: 'LinkedIn', url: 'https://www.linkedin.com', logo: 'linkedin.png' },
+                { name: 'TikTok', url: 'https://www.tiktok.com', logo: 'tiktok.png' },
+                { name: 'X', url: 'https://www.twitter.com', logo: 'x.png' },
+                { name: 'Instagram', url: 'https://www.instagram.com', logo: 'instagram.png' }
+            ];
+
+            for (let i = 0; i < 4; i++) {
+                const computer = document.createElement('a-box');
+                computer.setAttribute('position', `${x - 1.5 + i} 1.25 ${z}`);
+                computer.setAttribute('depth', '0');
+                computer.setAttribute('height', '1');
+                computer.setAttribute('width', '0.6');
+                computer.setAttribute('color', 'grey');
+                computer.setAttribute('text', { value: socialMedia[i].name, color: 'black', align: 'center', width: '1', wrapCount: '20' });
+                computer.addEventListener('click', () => window.open(socialMedia[i].url, '_blank'));
+                sceneEl.appendChild(computer);
+
+                const logo = document.createElement('a-image');
+                logo.setAttribute('src', socialMedia[i].logo);
+                logo.setAttribute('position', `${x - 1.5 + i} 1.50 ${z + 0.1}`);
+                logo.setAttribute('height', '0.2');
+                logo.setAttribute('width', '0.2');
+                logo.setAttribute('look-at', '[camera]'); // Ensure the logo faces the camera
+                logo.addEventListener('click', () => window.open(socialMedia[i].url, '_blank'));
+                sceneEl.appendChild(logo);
+
+                const chair = document.createElement('a-box');
+                chair.setAttribute('position', `${x - 1.5 + i} 0.5 ${z + 0.75}`);
+                chair.setAttribute('rotation', '0 180 0');
+                chair.setAttribute('depth', '0.5');
+                chair.setAttribute('height', '0.5');
+                chair.setAttribute('width', '0.5');
+                chair.setAttribute('color', '#333333');
+                sceneEl.appendChild(chair);
+            }
+        }
+
+        // Create furniture
+        for (let i = 0; i < 4; i++) {
+            createTableAndComputers(-4, -17 - i * 3);
+            createTableAndComputers(4, -17 - i * 3);
+        }
+    </script>
+
+</body>
+</html>
