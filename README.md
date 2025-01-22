@@ -3,7 +3,7 @@
 ## 🧑‍💻 Professional Version  
 
 ## **Team Members:**  
-- **Front-End Development:** John M. Pozo  
+- **Front-End Development/Back-End Development:** John M. Pozo  
 - **Back-End Development:** Adam  
 - **Presentation & Documentation:** Kevin  
 
@@ -33,7 +33,7 @@ This project was made possible with assistance from **ChatGPT-4o**, helping refi
 # 🚀 Brianrot Version 
 
 ## **👥 The Squad**  
-- **Me:** Front-end sorcery 🪄  
+- **Me:** Front-end/Back-end sorcery 🪄  
 - **Kevin:** Presentation Slides 🎤  
 - **Adam:** Backend wizard 🖥️  
 
